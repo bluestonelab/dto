@@ -1,10 +1,11 @@
 <?php
 
-namespace Bluestone;
+namespace Bluestone\DataTransferObject;
 
 use ArrayAccess;
+use JsonSerializable;
 
-abstract class DataTransferObject
+abstract class DataTransferObject implements JsonSerializable
 {
     public function __construct(...$args)
     {
@@ -23,15 +24,25 @@ abstract class DataTransferObject
     {
         $attributes = [];
 
-        foreach (get_object_vars($this) as $key => $value) {
+        $properties = array_keys(get_class_vars($this::class));
+
+        foreach ($properties as $property) {
+            if (! isset($this->$property)) {
+                $attributes[$property] = null;
+
+                continue;
+            }
+
+            $value = $this->$property;
+
             if ($value instanceof self) {
-                $attributes[$key] = $value->toArray();
+                $attributes[$property] = $value->toArray();
 
                 continue;
             }
 
             if (is_array($value) || $value instanceof ArrayAccess) {
-                $attributes[$key] = array_map(function ($row) {
+                $attributes[$property] = array_map(function ($row) {
                     if ($row instanceof self) {
                         return $row->toArray();
                     }
@@ -42,19 +53,14 @@ abstract class DataTransferObject
                 continue;
             }
 
-            $attributes[$key] = $value;
+            $attributes[$property] = $value;
         }
 
         return $attributes;
     }
 
-    public function toJson(int $options = 0): string
+    public function jsonSerialize(): mixed
     {
-        return json_encode($this->toArray(), $options);
-    }
-
-    public function __toString(): string
-    {
-        return $this->toJson();
+        return $this->toArray();
     }
 }
