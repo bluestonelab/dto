@@ -4,6 +4,8 @@ namespace Bluestone\DataTransferObject;
 
 use ArrayAccess;
 use JsonSerializable;
+use ReflectionClass;
+use ReflectionProperty;
 
 abstract class DataTransferObject implements JsonSerializable
 {
@@ -13,10 +15,25 @@ abstract class DataTransferObject implements JsonSerializable
             $args = $args[0];
         }
 
-        foreach (get_class_vars(static::class) as $key => $value) {
-            if (isset($args[$key])) {
-                $this->$key = $args[$key];
+        $class = new ReflectionClass($this);
+
+        foreach ($class->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            $propertyClass = $property->getType()->getName();
+            $propertyName = $property->getName();
+
+            if (! isset($args[$propertyName])) {
+                continue;
             }
+
+            $value = $args[$propertyName];
+
+            if (is_subclass_of($propertyClass, self::class)) {
+                $value = is_array($value) ? new $propertyClass($value) : $value;
+                $this->$propertyName = $value;
+                continue;
+            }
+
+            $this->$propertyName = $value;
         }
     }
 

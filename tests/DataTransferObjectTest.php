@@ -42,6 +42,19 @@ class DataTransferObjectTest extends TestCase
     }
 
     /** @test */
+    public function can_instantiate_complexe_dto_from_array()
+    {
+        $jane = new Student([
+            'name' => 'Jane',
+            'skill' => [
+                'name' => 'Architect',
+            ],
+        ]);
+
+        $this->assertEquals('Jane', $jane->name);
+    }
+
+    /** @test */
     public function can_transform_dto_to_array()
     {
         $skill = new Skill(name: 'Developer');
