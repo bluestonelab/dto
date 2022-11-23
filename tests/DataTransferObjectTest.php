@@ -6,6 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Tests\Artifacts\Skill;
 use Tests\Artifacts\Student;
 use Tests\Artifacts\University;
+use Tests\Artifacts\Gender;
 
 class DataTransferObjectTest extends TestCase
 {
@@ -29,15 +30,19 @@ class DataTransferObjectTest extends TestCase
     public function can_instantiate_complex_dto()
     {
         $skill = new Skill(name: 'Developer');
-        $jane = new Student(name: 'Jane', skill: $skill);
-        $john = new Student(name: 'John');
+        $jane = new Student(name: 'Jane', skill: $skill, gender: Gender::FEMALE);
+        $john = new Student(name: 'John', gender: 'Male');
         $university = new University(name: 'High Tech School', students: [$jane, $john]);
 
         $this->assertEquals('High Tech School', $university->name);
         $this->assertContainsOnlyInstancesOf(Student::class, $university->students);
         $this->assertEquals('Jane', $university->students[0]->name);
+        $this->assertInstanceOf(Gender::class, $university->students[0]->gender);
+        $this->assertEquals(Gender::FEMALE, $university->students[0]->gender);
         $this->assertEquals('Developer', $university->students[0]->skill->name);
         $this->assertEquals('John', $university->students[1]->name);
+        $this->assertInstanceOf(Gender::class, $university->students[1]->gender);
+        $this->assertEquals(Gender::MALE, $university->students[1]->gender);
         $this->assertNull($university->students[1]->skill);
     }
 
@@ -78,12 +83,14 @@ class DataTransferObjectTest extends TestCase
                     'skill' => [
                         'name' => 'Developer',
                     ],
-                    'ratings' => ['A', 'A+', 'B']
+                    'ratings' => ['A', 'A+', 'B'],
+                    'gender' => null,
                 ],
                 [
                     'name' => 'John',
                     'skill' => null,
                     'ratings' => ['A', 'B'],
+                    'gender' => null,
                 ],
             ],
         ];
@@ -95,9 +102,9 @@ class DataTransferObjectTest extends TestCase
     public function can_serialize_dto_to_json()
     {
         $skill = new Skill(name: 'Developer');
-        $jane = new Student(name: 'Jane', skill: $skill, ratings: ['A']);
+        $jane = new Student(name: 'Jane', skill: $skill, ratings: ['A'], gender: Gender::UNKNOWN);
 
-        $expectedJson = '{"name":"Jane","skill":{"name":"Developer"},"ratings":["A"]}';
+        $expectedJson = '{"name":"Jane","gender":"Unknown","skill":{"name":"Developer"},"ratings":["A"]}';
 
         $this->assertEquals($expectedJson, json_encode($jane));
     }
