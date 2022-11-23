@@ -2,6 +2,7 @@
 
 namespace Bluestone\DataTransferObject;
 
+use BackedEnum;
 use ArrayAccess;
 use JsonSerializable;
 use ReflectionClass;
@@ -25,15 +26,7 @@ abstract class DataTransferObject implements JsonSerializable
                 continue;
             }
 
-            $value = $args[$propertyName];
-
-            if (is_subclass_of($propertyClass, self::class)) {
-                $value = is_array($value) ? new $propertyClass($value) : $value;
-                $this->$propertyName = $value;
-                continue;
-            }
-
-            $this->$propertyName = $value;
+            $this->$propertyName = $this->castTo($propertyClass, $args[$propertyName]);
         }
     }
 
@@ -79,5 +72,14 @@ abstract class DataTransferObject implements JsonSerializable
     public function jsonSerialize(): mixed
     {
         return $this->toArray();
+    }
+
+    protected function castTo(string $class, mixed $value): mixed
+    {
+        return match (true) {
+            is_subclass_of($class, self::class) => is_array($value) ? new $class($value) : $value,
+            is_subclass_of($class, BackedEnum::class) => $value instanceof BackedEnum ? $value : $class::from($value),
+            default => $value
+        };
     }
 }
