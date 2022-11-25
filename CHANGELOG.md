@@ -4,6 +4,16 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## 0.4.1 (2022-11-25)
+
+### Continuous Integrations
+
+* Automatic update of CHANGELOG on commit on master.
+
+### Documentation
+
+* Add CHANGELOG.
+
 ## 0.4.0 (2022-11-23)
 
 ### Features
