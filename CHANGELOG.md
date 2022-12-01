@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## 0.5.0 (2022-12-01)
+
+### Features
+
+* Add Casting to DTO properties.
+
 ## 0.4.1 (2022-11-25)
 
 ### Continuous Integrations
