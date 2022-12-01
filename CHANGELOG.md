@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## 0.6.0 (2022-12-01)
+
+### Features
+
+* Cast property has been serialized to original format.
+
 ## 0.5.0 (2022-12-01)
 
 ### Features
