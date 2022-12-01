@@ -2,8 +2,8 @@
 
 namespace Bluestone\DataTransferObject;
 
-use BackedEnum;
 use ArrayAccess;
+use Bluestone\DataTransferObject\Reflection\PropertyResolver;
 use JsonSerializable;
 use ReflectionClass;
 use ReflectionProperty;
@@ -19,14 +19,12 @@ abstract class DataTransferObject implements JsonSerializable
         $class = new ReflectionClass($this);
 
         foreach ($class->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $propertyClass = $property->getType()->getName();
-            $propertyName = $property->getName();
+            $value = PropertyResolver::handle($property, $args);
 
-            if (! isset($args[$propertyName])) {
-                continue;
-            }
-
-            $this->$propertyName = $this->castTo($propertyClass, $args[$propertyName]);
+            $property->setValue(
+                $this,
+                $value
+            );
         }
     }
 
@@ -72,14 +70,5 @@ abstract class DataTransferObject implements JsonSerializable
     public function jsonSerialize(): mixed
     {
         return $this->toArray();
-    }
-
-    protected function castTo(string $class, mixed $value): mixed
-    {
-        return match (true) {
-            is_subclass_of($class, self::class) => is_array($value) ? new $class($value) : $value,
-            is_subclass_of($class, BackedEnum::class) => $value instanceof BackedEnum ? $value : $class::from($value),
-            default => $value
-        };
     }
 }

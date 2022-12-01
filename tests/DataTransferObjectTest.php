@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use DateTime;
 use PHPUnit\Framework\TestCase;
 use Tests\Artifacts\Skill;
 use Tests\Artifacts\Student;
@@ -47,16 +48,33 @@ class DataTransferObjectTest extends TestCase
     }
 
     /** @test */
-    public function can_instantiate_complexe_dto_from_array()
+    public function can_instantiate_complex_dto_from_array()
     {
         $jane = new Student([
             'name' => 'Jane',
             'skill' => [
                 'name' => 'Architect',
             ],
+            'gender' => 'Unknown',
         ]);
 
         $this->assertEquals('Jane', $jane->name);
+        $this->assertEquals(Gender::UNKNOWN, $jane->gender);
+    }
+
+    /** @test */
+    public function can_instantiate_complex_dto_with_casting()
+    {
+        $university = new University([
+            'name' => 'Nanar Factory',
+            'students' => [
+                ['name' => 'Spielberg'],
+                ['name' => 'Cameron']
+            ],
+        ]);
+
+        $this->assertContainsOnlyInstancesOf(Student::class, $university->students);
+        $this->assertEquals('Spielberg', $university->students[0]->name);
     }
 
     /** @test */
