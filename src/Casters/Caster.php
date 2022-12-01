@@ -4,5 +4,7 @@ namespace Bluestone\DataTransferObject\Casters;
 
 interface Caster
 {
-    public function cast(mixed $value);
+    public function set(mixed $value);
+
+    public function get(mixed $value);
 }

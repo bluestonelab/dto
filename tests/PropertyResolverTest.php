@@ -2,17 +2,19 @@
 
 namespace Tests;
 
+use Bluestone\DataTransferObject\DataTransferObject;
 use Bluestone\DataTransferObject\Reflection\PropertyResolver;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
+use Tests\Artifacts\FullName;
+use Tests\Artifacts\FullNameCaster;
 use Tests\Artifacts\Number;
-use Tests\Artifacts\AmountCaster;
 use Bluestone\DataTransferObject\Casters\CastWith;
 
 class PropertyResolverTest extends TestCase
 {
     /** @test */
-    public function can_handle_basic_property()
+    public function can_set_basic_property()
     {
         $class = new class {
             public int $number;
@@ -20,13 +22,13 @@ class PropertyResolverTest extends TestCase
 
         $property = new ReflectionProperty($class, 'number');
 
-        $value = PropertyResolver::handle($property, ['number' => 6]);
+        $value = PropertyResolver::set($property, ['number' => 6]);
 
         $this->assertEquals(6, $value);
     }
 
     /** @test */
-    public function can_handle_dto_property()
+    public function can_set_dto_property()
     {
         $class = new class {
             public Number $number;
@@ -34,29 +36,89 @@ class PropertyResolverTest extends TestCase
 
         $property = new ReflectionProperty($class, 'number');
 
-        $value = PropertyResolver::handle($property, ['number' => ['value' => 6]]);
+        $value = PropertyResolver::set($property, ['number' => ['value' => 6]]);
 
         $this->assertInstanceOf(Number::class, $value);
         $this->assertEquals(6, $value->value);
 
-        $value = PropertyResolver::handle($property, ['number' => new Number(value: 2)]);
+        $value = PropertyResolver::set($property, ['number' => new Number(value: 2)]);
 
         $this->assertInstanceOf(Number::class, $value);
         $this->assertEquals(2, $value->value);
     }
 
     /** @test */
-    public function can_handle_property_with_cast()
+    public function can_set_property_with_cast()
     {
         $class = new class {
-            #[CastWith(AmountCaster::class)]
-            public float $amount;
+            #[CastWith(FullNameCaster::class)]
+            public FullName $fullName;
         };
 
-        $property = new ReflectionProperty($class, 'amount');
+        $property = new ReflectionProperty($class, 'fullName');
 
-        $value = PropertyResolver::handle($property, ['amount' => "3\xc2\xa0000,45\xc2\xa0€"]);
+        $value = PropertyResolver::set($property, ['fullName' => "Chris Rooky"]);
 
-        $this->assertEquals(3000.45, $value);
+        $this->assertInstanceOf(FullName::class, $value);
+        $this->assertEquals("Chris", $value->firstname);
+        $this->assertEquals("Rooky", $value->lastname);
+    }
+
+    /** @test */
+    public function can_get_basic_property()
+    {
+        $class = new class {
+            public int $number;
+
+            public function __construct()
+            {
+                $this->number = 6;
+            }
+        };
+
+        $property = new ReflectionProperty($class, 'number');
+
+        $value = PropertyResolver::get($class, $property);
+
+        $this->assertEquals(6, $value);
+    }
+
+    /** @test */
+    public function can_get_dto_property()
+    {
+        $class = new class {
+            public Number $number;
+
+            public function __construct()
+            {
+                $this->number = new Number(value: 6);
+            }
+        };
+
+        $property = new ReflectionProperty($class, 'number');
+
+        $value = PropertyResolver::get($class, $property);
+
+        $this->assertEquals(['value' => 6], $value);
+    }
+
+    /** @test */
+    public function can_get_property_with_cast()
+    {
+        $class = new class {
+            #[CastWith(FullNameCaster::class)]
+            public FullName $fullName;
+
+            public function __construct()
+            {
+                $this->fullName = new FullName('Chris-David', 'Clemovitch');
+            }
+        };
+
+        $property = new ReflectionProperty($class, 'fullName');
+
+        $value = PropertyResolver::get($class, $property);
+
+        $this->assertEquals("Chris-David Clemovitch", $value);
     }
 }

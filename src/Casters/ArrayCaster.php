@@ -2,6 +2,7 @@
 
 namespace Bluestone\DataTransferObject\Casters;
 
+use Bluestone\DataTransferObject\DataTransferObject;
 use InvalidArgumentException;
 
 class ArrayCaster implements Caster
@@ -10,7 +11,7 @@ class ArrayCaster implements Caster
     {
     }
 
-    public function cast(mixed $value): array
+    public function set(mixed $value): array
     {
         return array_map(function ($item) {
             if ($item instanceof $this->type) {
@@ -27,6 +28,17 @@ class ArrayCaster implements Caster
                     $this->type
                 )
             );
+        }, $value);
+    }
+
+    public function get(mixed $value)
+    {
+        return array_map(function ($item) {
+            if ($item instanceof DataTransferObject) {
+                return $item->toArray();
+            }
+
+            return $item;
         }, $value);
     }
 }

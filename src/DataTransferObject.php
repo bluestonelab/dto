@@ -19,7 +19,7 @@ abstract class DataTransferObject implements JsonSerializable
         $class = new ReflectionClass($this);
 
         foreach ($class->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $value = PropertyResolver::handle($property, $args);
+            $value = PropertyResolver::set($property, $args);
 
             $property->setValue(
                 $this,
@@ -32,36 +32,10 @@ abstract class DataTransferObject implements JsonSerializable
     {
         $attributes = [];
 
-        $properties = array_keys(get_class_vars($this::class));
+        $class = new ReflectionClass($this);
 
-        foreach ($properties as $property) {
-            if (! isset($this->$property)) {
-                $attributes[$property] = null;
-
-                continue;
-            }
-
-            $value = $this->$property;
-
-            if ($value instanceof self) {
-                $attributes[$property] = $value->toArray();
-
-                continue;
-            }
-
-            if (is_array($value) || $value instanceof ArrayAccess) {
-                $attributes[$property] = array_map(function ($row) {
-                    if ($row instanceof self) {
-                        return $row->toArray();
-                    }
-
-                    return $row;
-                }, $value);
-
-                continue;
-            }
-
-            $attributes[$property] = $value;
+        foreach ($class->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            $attributes[$property->getName()] = PropertyResolver::get($this, $property);
         }
 
         return $attributes;
