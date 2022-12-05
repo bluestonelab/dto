@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## 0.7.0 (2022-12-05)
+
+### Features
+
+* Can map property from a source with different name.
+
 ## 0.6.0 (2022-12-01)
 
 ### Features
