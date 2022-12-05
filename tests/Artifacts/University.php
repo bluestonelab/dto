@@ -3,7 +3,7 @@
 namespace Tests\Artifacts;
 
 use Bluestone\DataTransferObject\Casters\ArrayCaster;
-use Bluestone\DataTransferObject\Casters\CastWith;
+use Bluestone\DataTransferObject\Attributes\CastWith;
 use Bluestone\DataTransferObject\DataTransferObject;
 
 class University extends DataTransferObject

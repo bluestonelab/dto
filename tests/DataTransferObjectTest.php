@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Bluestone\DataTransferObject\Casters\CastWith;
+use Bluestone\DataTransferObject\Attributes\CastWith;
 use Bluestone\DataTransferObject\DataTransferObject;
 use PHPUnit\Framework\TestCase;
 use Tests\Artifacts\FullName;
@@ -34,8 +34,8 @@ class DataTransferObjectTest extends TestCase
     public function can_instantiate_complex_dto()
     {
         $skill = new Skill(name: 'Developer');
-        $jane = new Student(fullName: 'Jane Doe', skill: $skill, gender: Gender::FEMALE);
-        $john = new Student(fullName: 'John Doe', gender: 'Male');
+        $jane = new Student(full_name: 'Jane Doe', skill: $skill, gender: Gender::FEMALE);
+        $john = new Student(full_name: 'John Doe', gender: 'Male');
         $university = new University(name: 'High Tech School', students: [$jane, $john]);
 
         $this->assertEquals('High Tech School', $university->name);
@@ -54,7 +54,7 @@ class DataTransferObjectTest extends TestCase
     public function can_instantiate_complex_dto_from_array()
     {
         $jane = new Student([
-            'fullName' => 'Jane Doe',
+            'full_name' => 'Jane Doe',
             'skill' => [
                 'name' => 'Architect',
             ],
@@ -72,8 +72,8 @@ class DataTransferObjectTest extends TestCase
         $university = new University([
             'name' => 'Nanar Factory',
             'students' => [
-                ['fullName' => 'Steven Spielberg'],
-                ['fullName' => 'James Cameron']
+                ['full_name' => 'Steven Spielberg'],
+                ['full_name' => 'James Cameron']
             ],
         ]);
 
@@ -93,15 +93,15 @@ class DataTransferObjectTest extends TestCase
     public function can_transform_complex_dto_to_array()
     {
         $skill = new Skill(name: 'Developer');
-        $jane = new Student(fullName: 'Jane Doe', skill: $skill, gender: 'Female', ratings: ['A', 'A+', 'B']);
-        $john = new Student(fullName: 'John Doe', ratings: ['A', 'B']);
+        $jane = new Student(full_name: 'Jane Doe', skill: $skill, gender: 'Female', ratings: ['A', 'A+', 'B']);
+        $john = new Student(full_name: 'John Doe', ratings: ['A', 'B']);
         $university = new University(name: 'High Tech School', students: [$jane, $john]);
 
         $expectedArray = [
             'name' => 'High Tech School',
             'students' => [
                 [
-                    'fullName' => 'Jane Doe',
+                    'full_name' => 'Jane Doe',
                     'skill' => [
                         'name' => 'Developer',
                     ],
@@ -109,7 +109,7 @@ class DataTransferObjectTest extends TestCase
                     'gender' => 'Female',
                 ],
                 [
-                    'fullName' => 'John Doe',
+                    'full_name' => 'John Doe',
                     'skill' => null,
                     'ratings' => ['A', 'B'],
                     'gender' => null,
@@ -124,9 +124,9 @@ class DataTransferObjectTest extends TestCase
     public function can_serialize_dto_to_json()
     {
         $skill = new Skill(name: 'Developer');
-        $jane = new Student(fullName: 'Jane Doe', skill: $skill, ratings: ['A'], gender: Gender::UNKNOWN);
+        $jane = new Student(full_name: 'Jane Doe', skill: $skill, ratings: ['A'], gender: Gender::UNKNOWN);
 
-        $expectedJson = '{"fullName":"Jane Doe","gender":"Unknown","skill":{"name":"Developer"},"ratings":["A"]}';
+        $expectedJson = '{"full_name":"Jane Doe","gender":"Unknown","skill":{"name":"Developer"},"ratings":["A"]}';
 
         $this->assertEquals($expectedJson, json_encode($jane));
     }
@@ -147,7 +147,7 @@ class DataTransferObjectTest extends TestCase
     /** @test */
     public function can_unserialize_dto_from_json()
     {
-        $json = '{"fullName":"Jane Doe","gender":"Unknown","skill":{"name":"Developer"},"gender":"Female","ratings":["A"]}';
+        $json = '{"full_name":"Jane Doe","gender":"Unknown","skill":{"name":"Developer"},"gender":"Female","ratings":["A"]}';
 
         $jane = new Student(json_decode($json, true));
 

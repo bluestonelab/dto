@@ -3,8 +3,9 @@
 namespace Bluestone\DataTransferObject\Reflection;
 
 use BackedEnum;
+use Bluestone\DataTransferObject\Attributes\Map;
 use Bluestone\DataTransferObject\Casters\Caster;
-use Bluestone\DataTransferObject\Casters\CastWith;
+use Bluestone\DataTransferObject\Attributes\CastWith;
 use Bluestone\DataTransferObject\DataTransferObject;
 use ReflectionProperty;
 
@@ -14,11 +15,17 @@ class PropertyResolver
         ReflectionProperty $property,
         array $args
     ) {
-        if (! isset($args[$property->getName()])) {
+        $name = $property->getName();
+
+        if ($attributes = $property->getAttributes(Map::class)) {
+            $name = $attributes[0]->newInstance()->name;
+        }
+
+        if (! isset($args[$name])) {
             return $property->getDefaultValue();
         }
 
-        $value = $args[$property->getName()];
+        $value = $args[$name];
 
         if ($attributes = $property->getAttributes(CastWith::class)) {
             $attribute = $attributes[0]->newInstance();
@@ -46,6 +53,12 @@ class PropertyResolver
         object $object,
         ReflectionProperty $property,
     ): mixed {
+        $name = $property->getName();
+
+        if ($attributes = $property->getAttributes(Map::class)) {
+            $name = $attributes[0]->newInstance()->name;
+        }
+
         $value = $property->getValue($object);
 
         if ($attributes = $property->getAttributes(CastWith::class)) {
@@ -54,19 +67,19 @@ class PropertyResolver
             /** @var Caster $caster */
             $caster = new $attribute->caster(...$attribute->args);
 
-            return $caster->get($value);
+            return [$name, $caster->get($value)];
         }
 
         $type = $property->getType()->getName();
 
         if (is_subclass_of($type, DataTransferObject::class) && ! is_null($value)) {
-            return $value->toArray();
+            return [$name, $value->toArray()];
         }
 
         if (is_subclass_of($type, BackedEnum::class) && ! is_null($value)) {
-            return $value->value;
+            return [$name, $value->value];
         }
 
-        return $value;
+        return [$name, $value];
     }
 }

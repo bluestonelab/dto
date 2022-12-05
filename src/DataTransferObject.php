@@ -2,7 +2,6 @@
 
 namespace Bluestone\DataTransferObject;
 
-use ArrayAccess;
 use Bluestone\DataTransferObject\Reflection\PropertyResolver;
 use JsonSerializable;
 use ReflectionClass;
@@ -35,7 +34,8 @@ abstract class DataTransferObject implements JsonSerializable
         $class = new ReflectionClass($this);
 
         foreach ($class->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $attributes[$property->getName()] = PropertyResolver::get($this, $property);
+            list($key, $value) = PropertyResolver::get($this, $property);
+            $attributes[$key] = $value;
         }
 
         return $attributes;

@@ -9,7 +9,7 @@ use ReflectionProperty;
 use Tests\Artifacts\FullName;
 use Tests\Artifacts\FullNameCaster;
 use Tests\Artifacts\Number;
-use Bluestone\DataTransferObject\Casters\CastWith;
+use Bluestone\DataTransferObject\Attributes\CastWith;
 
 class PropertyResolverTest extends TestCase
 {
@@ -80,7 +80,7 @@ class PropertyResolverTest extends TestCase
 
         $value = PropertyResolver::get($class, $property);
 
-        $this->assertEquals(6, $value);
+        $this->assertEquals(['number', 6], $value);
     }
 
     /** @test */
@@ -99,7 +99,7 @@ class PropertyResolverTest extends TestCase
 
         $value = PropertyResolver::get($class, $property);
 
-        $this->assertEquals(['value' => 6], $value);
+        $this->assertEquals(['number', ['value' => 6]], $value);
     }
 
     /** @test */
@@ -119,6 +119,6 @@ class PropertyResolverTest extends TestCase
 
         $value = PropertyResolver::get($class, $property);
 
-        $this->assertEquals("Chris-David Clemovitch", $value);
+        $this->assertEquals(['fullName', "Chris-David Clemovitch"], $value);
     }
 }

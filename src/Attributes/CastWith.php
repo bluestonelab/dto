@@ -1,8 +1,9 @@
 <?php
 
-namespace Bluestone\DataTransferObject\Casters;
+namespace Bluestone\DataTransferObject\Attributes;
 
 use Attribute;
+use Bluestone\DataTransferObject\Casters\Caster;
 use InvalidArgumentException;
 
 #[Attribute]
