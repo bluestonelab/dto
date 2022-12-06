@@ -2,6 +2,7 @@
 
 namespace Tests;
 
+use Bluestone\DataTransferObject\Attributes\Map;
 use Bluestone\DataTransferObject\DataTransferObject;
 use Bluestone\DataTransferObject\Reflection\PropertyResolver;
 use PHPUnit\Framework\TestCase;
@@ -65,6 +66,21 @@ class PropertyResolverTest extends TestCase
     }
 
     /** @test */
+    public function can_set_property_with_map()
+    {
+        $class = new class {
+            #[Map('full_name')]
+            public string $fullName;
+        };
+
+        $property = new ReflectionProperty($class, 'fullName');
+
+        $value = PropertyResolver::set($property, ['full_name' => "Chris Rooky"]);
+
+        $this->assertEquals("Chris Rooky", $value);
+    }
+
+    /** @test */
     public function can_get_basic_property()
     {
         $class = new class {
@@ -120,5 +136,25 @@ class PropertyResolverTest extends TestCase
         $value = PropertyResolver::get($class, $property);
 
         $this->assertEquals(['fullName', "Chris-David Clemovitch"], $value);
+    }
+
+    /** @test */
+    public function can_get_property_with_map()
+    {
+        $class = new class {
+            #[Map('full_name')]
+            public string $fullName;
+
+            public function __construct()
+            {
+                $this->fullName = 'Chris-David Clemovitch';
+            }
+        };
+
+        $property = new ReflectionProperty($class, 'fullName');
+
+        $value = PropertyResolver::get($class, $property);
+
+        $this->assertEquals(['full_name', "Chris-David Clemovitch"], $value);
     }
 }
