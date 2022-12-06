@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## 1.0.0 (2022-12-06)
+
+### Tests
+
+* Add some tests on map property.
+
 ## 0.7.0 (2022-12-05)
 
 ### Features
