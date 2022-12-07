@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## 1.1.0 (2022-12-07)
+
+### Features
+
+* Can Map property with dot notation.
+
 ## 1.0.1 (2022-12-06)
 
 ### Documentation
