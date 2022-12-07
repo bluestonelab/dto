@@ -4,6 +4,12 @@
 All notable changes to this project will be documented in this file.
 <!--- END HEADER -->
 
+## 1.1.1 (2022-12-07)
+
+### Bug Fixes
+
+* Nullable array casting.
+
 ## 1.1.0 (2022-12-07)
 
 ### Features
