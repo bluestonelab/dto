@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Bluestone\DataTransferObject\Attributes\Map;
+use Bluestone\DataTransferObject\Casters\ArrayCaster;
 use Bluestone\DataTransferObject\DataTransferObject;
 use Bluestone\DataTransferObject\Reflection\PropertyResolver;
 use PHPUnit\Framework\TestCase;
@@ -11,6 +12,7 @@ use Tests\Artifacts\FullName;
 use Tests\Artifacts\FullNameCaster;
 use Tests\Artifacts\Number;
 use Bluestone\DataTransferObject\Attributes\CastWith;
+use Tests\Artifacts\Student;
 
 class CanSetPropertyFromResolverTest extends TestCase
 {
@@ -61,6 +63,12 @@ class CanSetPropertyFromResolverTest extends TestCase
                 'fullName',
                 ['fullName' => "Chris Rooky"],
                 ['firstname' => "Chris", 'lastname' => "Rooky"],
+            ],
+            "Cast nullable array property" => [
+                new class { #[CastWith(ArrayCaster::class, type: Number::class)] public ?array $numbers; },
+                'numbers',
+                ['numbers' => null],
+                ['numbers' => null],
             ],
             "Map property" => [
                 new class { #[Map('full_name')] public string $fullName; },

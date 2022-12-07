@@ -56,7 +56,7 @@ class PropertyResolver
             $name = $attributes[0]->newInstance()->name;
         }
 
-        $value = $property->getValue($object);
+        $value = $property->isInitialized($object) ? $property->getValue($object) : null;
 
         $type = $property->getType()->getName();
 

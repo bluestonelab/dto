@@ -4,6 +4,7 @@ namespace Tests;
 
 use Bluestone\DataTransferObject\Attributes\CastWith;
 use Bluestone\DataTransferObject\Attributes\Map;
+use Bluestone\DataTransferObject\Casters\ArrayCaster;
 use Bluestone\DataTransferObject\Reflection\PropertyResolver;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
@@ -43,6 +44,11 @@ class CanGetPropertyFromResolverTest extends TestCase
                 new class { #[CastWith(FullNameCaster::class)] public FullName $fullName; public function __construct() { $this->fullName = new FullName('Chris-David', 'Clemovitch'); } },
                 'fullName',
                 ['fullName', "Chris-David Clemovitch"]
+            ],
+            "Cast nullable array property" => [
+                new class { #[CastWith(ArrayCaster::class, type: Number::class)] public ?array $numbers; },
+                'numbers',
+                ['numbers', null]
             ],
             "Map property" => [
                 new class { #[Map('full_name')] public string $fullName; public function __construct() { $this->fullName = 'Chris-David Clemovitch'; } },

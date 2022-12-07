@@ -11,8 +11,12 @@ class ArrayCaster implements Caster
     {
     }
 
-    public function set(mixed $value): array
+    public function set(mixed $value)
     {
+        if (is_null($value)) {
+            return null;
+        }
+
         return array_map(function ($item) {
             if ($item instanceof $this->type) {
                 return $item;
@@ -33,6 +37,10 @@ class ArrayCaster implements Caster
 
     public function get(mixed $value)
     {
+        if (is_null($value)) {
+            return null;
+        }
+
         return array_map(function ($item) {
             if ($item instanceof DataTransferObject) {
                 return $item->toArray();
