@@ -41,7 +41,7 @@ abstract class DataTransferObject implements JsonSerializable
         return $attributes;
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->toArray();
     }

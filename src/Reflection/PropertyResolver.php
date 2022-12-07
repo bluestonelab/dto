@@ -3,6 +3,7 @@
 namespace Bluestone\DataTransferObject\Reflection;
 
 use BackedEnum;
+use Bluestone\Collection\Arr;
 use Bluestone\DataTransferObject\Attributes\Map;
 use Bluestone\DataTransferObject\Casters\Caster;
 use Bluestone\DataTransferObject\Attributes\CastWith;
@@ -21,11 +22,7 @@ class PropertyResolver
             $name = $attributes[0]->newInstance()->name;
         }
 
-        if (! isset($args[$name])) {
-            return $property->getDefaultValue();
-        }
-
-        $value = $args[$name];
+        $value = Arr::get($args, $name, $property->getDefaultValue());
 
         if ($attributes = $property->getAttributes(CastWith::class)) {
             $attribute = $attributes[0]->newInstance();
@@ -43,7 +40,7 @@ class PropertyResolver
         }
 
         if (is_subclass_of($type, BackedEnum::class)) {
-            return $value instanceof BackedEnum ? $value : $type::from($value);
+            return $value instanceof BackedEnum || is_null($value) ? $value : $type::from($value);
         }
 
         return $value;
@@ -61,23 +58,32 @@ class PropertyResolver
 
         $value = $property->getValue($object);
 
+        $type = $property->getType()->getName();
+
         if ($attributes = $property->getAttributes(CastWith::class)) {
             $attribute = $attributes[0]->newInstance();
 
             /** @var Caster $caster */
             $caster = new $attribute->caster(...$attribute->args);
 
-            return [$name, $caster->get($value)];
+            $value = $caster->get($value);
         }
 
-        $type = $property->getType()->getName();
-
         if (is_subclass_of($type, DataTransferObject::class) && ! is_null($value)) {
-            return [$name, $value->toArray()];
+            $value = $value->toArray();
         }
 
         if (is_subclass_of($type, BackedEnum::class) && ! is_null($value)) {
-            return [$name, $value->value];
+            $value = $value->value;
+        }
+
+        if (str_contains($name, '.')) {
+            $fragments = array_reverse(explode('.', $name));
+            $name = array_pop($fragments);
+
+            foreach ($fragments as $key) {
+                $value = [$key => $value];
+            }
         }
 
         return [$name, $value];
